@@ -8,7 +8,7 @@ Javascript utility for providing a semaphore locking mechanism
 ## Usage:
 
 ```
-SemaphoreJs.lock(uniqueName, successCallback[[, timeoutCallback], maxWaitTime]);
+SemaphoreJs.lock(uniqueName, successCallback[[, maxWaitTime], timeoutCallback]);
 ```
 or
 ```
