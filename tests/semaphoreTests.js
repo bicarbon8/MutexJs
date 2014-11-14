@@ -1,6 +1,8 @@
 var QUnit = QUnit || {};
 var SemaphoreJs = SemaphoreJs || {};
 
+QUnit.config.testTimeout = 10000;
+
 QUnit.asyncTest("can lock with name and block", function (assert) {
     'use strict';
     expect(1);
@@ -24,16 +26,31 @@ QUnit.asyncTest("can lock with name and block", function (assert) {
     SemaphoreJs.lock('test', pass); // no timeout
 });
 
-QUnit.test("can create multiple locks with different names", function (assert) {
+QUnit.asyncTest("multiple locks can be added and removed", function (assert) {
     'use strict';
-    expect(11);
+    expect(20);
+    var completed = 0;
     for (var i=0; i<10; i++) {
-        SemaphoreJs.lock(i.toString(), function () {
-            SemaphoreJs.release(i.toString());
-            assert.ok(true);
+        SemaphoreJs.lock("test" + i, function () {
+            setTimeout(function () {
+                i--;
+                assert.ok(SemaphoreJs.MUTEX._get("test" + i), "expected that 1 locks were created for: test" + i);
+                SemaphoreJs.release("test" + i);
+                assert.ok(SemaphoreJs.MUTEX._get("test" + i) == undefined, "expected that 0 locks remained for: test" + i);
+                completed++;
+            }, 1000);
         }); // no timeout
     }
-    assert.ok(SemaphoreJs.MUTEX._locks.length === 10, "expected that 10 locks were created, but was: " + SemaphoreJs.MUTEX._locks.length);
+
+    function confirm() {
+        if (completed !== 10) {
+            setTimeout(confirm, 50);
+        } else {
+            QUnit.start();
+        }
+    }
+
+    confirm();
 });
 
 QUnit.asyncTest("can timeout waiting for lock", function (assert) {

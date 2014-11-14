@@ -1,38 +1,49 @@
 var SemaphoreJs = {
     RETRY_MS: 10,
     MUTEX: {
-        _getLockObj: function (expiresAt) {
+        _lock: function (name, expiresAt) {
             'use strict';
-            var self = {
-                expiresAt: expiresAt
-            };
-            return self;
+            this.name = name;
+            this.expiresAt = expiresAt;
         },
         _locks: [],
         get: function (name, expiresInMs) {
             'use strict';
             var expiresAt = undefined, // never expires (DANGER!)
-                unlocked = false;
+                unlocked = false,
+                lock = SemaphoreJs.MUTEX._get(name);
+
             if (expiresInMs) {
                 expiresAt = new Date().getTime() + expiresInMs;
             }
             
-            if (!SemaphoreJs.MUTEX._locks[name]) {
+            if (!lock) {
                 unlocked = true; // doesn't exist
-            } else if ((SemaphoreJs.MUTEX._locks[name].expiresAt) && (SemaphoreJs.MUTEX._locks[name].expiresAt < new Date().getTime())){
+            } else if ((lock.expiresAt) && (lock.expiresAt < new Date().getTime())){
                 unlocked = true; // exists, but is expired
             }
             
             if (unlocked) {
-                SemaphoreJs.MUTEX._locks[name] = SemaphoreJs.MUTEX._getLockObj(expiresAt);
+                SemaphoreJs.MUTEX._locks.push(new SemaphoreJs.MUTEX._lock(name, expiresAt));
                 return true;
             } else {
                 return false;
             }
         },
+        _get: function (name) {
+            'use strict';
+            for (var key in SemaphoreJs.MUTEX._locks) {
+                if (SemaphoreJs.MUTEX._locks[key].name === name) {
+                    return SemaphoreJs.MUTEX._locks[key];
+                }
+            }
+            return undefined; // not found
+        },
         release: function (name) {
             'use strict';
-            delete SemaphoreJs.MUTEX._locks[name];
+            SemaphoreJs.MUTEX._locks = SemaphoreJs.MUTEX._locks.filter(function (el) {
+                return el.name !== name;
+            });
             return true;
         }
     },
