@@ -14,3 +14,6 @@ or
 ```
 SemaphoreJs.lockFor(uniqueName, successCallback, duration);
 ```
+
+## Tests:
+[index.html](http://rawgit.com/bicarbon8/SemaphoreJs/master/tests/index.html)
