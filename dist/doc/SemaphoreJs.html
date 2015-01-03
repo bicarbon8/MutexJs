@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Class: SemaphoreJs</title>
-
+    
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,179 +16,165 @@
 <body>
 
 <div id="main">
-
-    <h1 class="page-title">Class: SemaphoreJs</h1>
-
     
-
+    <h1 class="page-title">Class: SemaphoreJs</h1>
+    
+    
 
 
 
 <section>
-
+    
 <header>
+    <h2>
+    SemaphoreJs
+    </h2>
     
-        <h2>
-        SemaphoreJs
-        </h2>
-        
-    
-</header>
+</header>  
 
 <article>
     <div class="container-overview">
     
+    
+    
         
 <dt>
+    <h4 class="name" id="SemaphoreJs"><span class="type-signature"></span>new SemaphoreJs<span class="signature">()</span><span class="type-signature"></span></h4>
     
-        <h4 class="name" id="SemaphoreJs"><span class="type-signature"></span>new SemaphoreJs<span class="signature">()</span><span class="type-signature"></span></h4>
-
-        
     
 </dt>
 <dd>
-
+    
     
 
     
-
     
-
     
-
     
-
     
-
-
+    
+    
 <dl class="details">
-
+    
+        
+    
+    
     
 
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
+    
+    
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="semaphore.js.html">semaphore.js</a>, <a href="semaphore.js.html#line2">line 2</a>
     </li></ul></dd>
     
-
     
-
     
-
+    
+    
+    
     
 </dl>
 
-
+    
     
 
     
 
     
-
     
-
     
-
     
-
+    
+    
     
 </dd>
 
     
     </div>
-
     
-
     
-
     
-
-     
-
     
-
     
-
+    
+    
+    
+    
+    
+    
+    
+    
     
         <h3 class="subsection-title">Methods</h3>
-
+        
         <dl>
             
 <dt>
+    <h4 class="name" id="lock"><span class="type-signature">&lt;static> </span>lock<span class="signature">(name, success, <span class="optional">maxWaitMs</span>, <span class="optional">timeoutCallback</span>)</span><span class="type-signature"></span></h4>
     
-        <h4 class="name" id="lock"><span class="type-signature">(static) </span>lock<span class="signature">(name, success, maxWaitMs<span class="signature-attributes">opt</span>, timeoutCallback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-
-        
     
 </dt>
 <dd>
-
+    
     
     <div class="description">
-        Create a lock using the passed in name or wait until the lockcan be obtained or for the <i><b>maxWaitMs</b></i> if it is currently in use.If <i><b>maxWaitMs</b></i> time has passed and the lock is not available then<i><b>timeoutCallback</b></i> will be called. The lock will be held untilreleased.
+        Create a lock using the passed in name or wait until the lock
+can be obtained or for the <i><b>maxWaitMs</b></i> if it is currently in use.
+If <i><b>maxWaitMs</b></i> time has passed and the lock is not available then
+<i><b>timeoutCallback</b></i> will be called. The lock will be held until
+released.
     </div>
     
 
     
-
     
-
     
-
+    
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
         <tr>
             
                 <td class="name"><code>name</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -197,33 +183,33 @@
 
             
             </td>
-
+            
             
                 <td class="attributes">
                 
-
+                    
                 
-
+                    
                 
                 </td>
             
-
+            
             
                 <td class="default">
                 
                 </td>
             
-
+            
             <td class="description last">unique name of lock to acquire</td>
         </tr>
-
-    
-
+	
+	
+	
         <tr>
             
                 <td class="name"><code>success</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -232,33 +218,35 @@
 
             
             </td>
-
+            
             
                 <td class="attributes">
                 
-
+                    
                 
-
+                    
                 
                 </td>
             
-
+            
             
                 <td class="default">
                 
                 </td>
             
-
-            <td class="description last">function to call when lock acquired. This  function will be passed the unique id of the lock which must be used  to release the lock.</td>
+            
+            <td class="description last">function to call when lock acquired. This
+  function will be passed the unique id of the lock which must be used
+  to release the lock.</td>
         </tr>
-
-    
-
+	
+	
+	
         <tr>
             
                 <td class="name"><code>maxWaitMs</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -267,19 +255,19 @@
 
             
             </td>
-
+            
             
                 <td class="attributes">
                 
                     &lt;optional><br>
                 
-
+                    
                 
-
+                    
                 
                 </td>
             
-
+            
             
                 <td class="default">
                 
@@ -287,17 +275,18 @@
                 
                 </td>
             
-
-            <td class="description last">number of milliseconds to wait  for lock to be aquired if not available immediately</td>
+            
+            <td class="description last">number of milliseconds to wait
+  for lock to be aquired if not available immediately</td>
         </tr>
-
-    
-
+	
+	
+	
         <tr>
             
                 <td class="name"><code>timeoutCallback</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -306,83 +295,75 @@
 
             
             </td>
-
+            
             
                 <td class="attributes">
                 
                     &lt;optional><br>
                 
-
+                    
                 
-
+                    
                 
                 </td>
             
-
+            
             
                 <td class="default">
                 
                 </td>
             
-
-            <td class="description last">function to call when  lock could not be acquired within the specified time</td>
+            
+            <td class="description last">function to call when
+  lock could not be acquired within the specified time</td>
         </tr>
-
-    
-    </tbody>
+	
+	
+	</tbody>
 </table>
     
-
     
-
-
+    
 <dl class="details">
-
+    
+        
+    
+    
     
 
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
+    
+    
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="semaphore.js.html">semaphore.js</a>, <a href="semaphore.js.html#line86">line 86</a>
     </li></ul></dd>
     
-
     
-
     
-
+    
+    
+    
     
 </dl>
 
-
+    
     
 
     
 
     
-
     
-
     
     <h5>Throws:</h5>
     
@@ -391,7 +372,9 @@
 <dl>
     <dt>
         <div class="param-desc">
-        err - if lock cannot be acquired by <i><b>maxWaitMs</b></i>  and no <i><b>timeoutCallback</b></i> is specified then an exception will be  thrown instead.
+        err - if lock cannot be acquired by <i><b>maxWaitMs</b></i>
+  and no <i><b>timeoutCallback</b></i> is specified then an exception will be
+  thrown instead.
         </div>
     </dt>
     <dt>
@@ -411,64 +394,63 @@
 
 
         
-
     
-
+    
+    
     
 </dd>
 
         
             
 <dt>
+    <h4 class="name" id="lockFor"><span class="type-signature">&lt;static> </span>lockFor<span class="signature">(name, success, duration)</span><span class="type-signature"></span></h4>
     
-        <h4 class="name" id="lockFor"><span class="type-signature">(static) </span>lockFor<span class="signature">(name, success, duration)</span><span class="type-signature"></span></h4>
-
-        
     
 </dt>
 <dd>
-
+    
     
     <div class="description">
-        Create a lock using the passed in name or wait until the lockcan be obtained if it is currently in use. Once obtained, the lockwill be held for maximum <i><b>duration</b></i> milliseconds or untilreleased.
+        Create a lock using the passed in name or wait until the lock
+can be obtained if it is currently in use. Once obtained, the lock
+will be held for maximum <i><b>duration</b></i> milliseconds or until
+released.
     </div>
     
 
     
-
     
-
     
-
+    
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
         <tr>
             
                 <td class="name"><code>name</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -477,21 +459,21 @@
 
             
             </td>
-
             
-
             
-
+            
+            
+            
             <td class="description last">unique name of lock to acquire</td>
         </tr>
-
-    
-
+	
+	
+	
         <tr>
             
                 <td class="name"><code>success</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -500,21 +482,21 @@
 
             
             </td>
-
             
-
             
-
+            
+            
+            
             <td class="description last">function to call when lock acquired</td>
         </tr>
-
-    
-
+	
+	
+	
         <tr>
             
                 <td class="name"><code>duration</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -523,87 +505,76 @@
 
             
             </td>
-
             
-
             
-
+            
+            
+            
             <td class="description last">number of milliseconds to hold the lock</td>
         </tr>
-
-    
-    </tbody>
+	
+	
+	</tbody>
 </table>
     
-
     
-
-
+    
 <dl class="details">
-
+    
+        
+    
+    
     
 
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
+    
+    
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="semaphore.js.html">semaphore.js</a>, <a href="semaphore.js.html#line104">line 104</a>
     </li></ul></dd>
     
-
     
-
     
-
+    
+    
+    
     
 </dl>
 
-
+    
     
 
     
 
     
-
     
-
     
-
     
-
+    
+    
     
 </dd>
 
         
             
 <dt>
+    <h4 class="name" id="release"><span class="type-signature">&lt;static> </span>release<span class="signature">(id)</span><span class="type-signature"></span></h4>
     
-        <h4 class="name" id="release"><span class="type-signature">(static) </span>release<span class="signature">(id)</span><span class="type-signature"></span></h4>
-
-        
     
 </dt>
 <dd>
-
+    
     
     <div class="description">
         Release a lock using the <i><b>id</b></i> returned when the lock was acquired
@@ -611,40 +582,38 @@
     
 
     
-
     
-
     
-
+    
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
         <tr>
             
                 <td class="name"><code>id</code></td>
             
-
+            
             <td class="type">
             
                 
@@ -653,85 +622,77 @@
 
             
             </td>
-
             
-
             
-
-            <td class="description last">a unique identifier for the lock returned when the lock  was acquired</td>
+            
+            
+            
+            <td class="description last">a unique identifier for the lock returned when the lock
+  was acquired</td>
         </tr>
-
-    
-    </tbody>
+	
+	
+	</tbody>
 </table>
     
-
     
-
-
+    
 <dl class="details">
-
+    
+        
+    
+    
     
 
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
     
-
+    
+    
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="semaphore.js.html">semaphore.js</a>, <a href="semaphore.js.html#line114">line 114</a>
     </li></ul></dd>
     
-
     
-
     
-
+    
+    
+    
     
 </dl>
 
-
+    
     
 
     
 
     
-
     
-
     
-
     
-
+    
+    
     
 </dd>
 
         </dl>
     
-
     
-
+    
+    
     
 </article>
 
-</section>
+</section>  
 
 
 
@@ -745,7 +706,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha10</a> on Fri Nov 14 2014 20:07:51 GMT+0000 (GMT Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Jan 03 2015 14:14:40 GMT-0000 (GMT)
 </footer>
 
 <script> prettyPrint(); </script>
