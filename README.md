@@ -1,9 +1,11 @@
-SemaphoreJs
+SemaphoreJs ![build status](https://travis-ci.org/bicarbon8/SemaphoreJs.svg)
 ===========
 
 in the world of async javascript callbacks this library provides a mechanism to ensure resources are not being updated by other async processes (useful for multipart resource activities)
 
-[JSDoc Documentation](http://rawgit.com/bicarbon8/SemaphoreJs/master/out/SemaphoreJs.html)
+[JSDoc Documentation](http://rawgit.com/bicarbon8/SemaphoreJs/master/dist/doc/SemaphoreJs.html)
+
+[Minified File](http://rawgit.com/bicarbon8/SemaphoreJs/master/dist/semaphore.min.js)
 
 ## Usage:
 
