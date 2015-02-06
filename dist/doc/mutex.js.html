@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: semaphore.js</title>
+    <title>JSDoc: Source: mutex.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: semaphore.js</h1>
+    <h1 class="page-title">Source: mutex.js</h1>
     
     
 
@@ -26,10 +26,13 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>/** @class */
-var SemaphoreJs = {
+var MutexJs = {
     RETRY_MS: 10,
     /** @ignore */
-    MUTEX: {
+    Semaphore: {
+        /** @ignore */
+        _locks: [],
+
         /** @ignore */
         _lock: function (id, name, expiresAt) {
             'use strict';
@@ -37,50 +40,52 @@ var SemaphoreJs = {
             this.name = name;
             this.expiresAt = expiresAt;
         },
-        /** @ignore */
-        _locks: [],
+
         /** @ignore */
         get: function (name, expiresInMs) {
             'use strict';
-            var expiresAt = undefined, // never expires (DANGER!)
+            var expiresAt = null, // never expires (DANGER!)
                 unlocked = false,
-                lock = SemaphoreJs.MUTEX._get(name);
+                lock = MutexJs.Semaphore._get(name);
 
             if (expiresInMs) {
                 expiresAt = new Date().getTime() + expiresInMs;
             }
-            
+
             if (!lock) {
                 unlocked = true; // doesn't exist
             } else if ((lock.expiresAt) && (lock.expiresAt &lt; new Date().getTime())){
                 unlocked = true; // exists, but is expired
             }
-            
+
             if (unlocked) {
-                var id = SemaphoreJs.MUTEX._guid();
-                SemaphoreJs.MUTEX._locks.push(new SemaphoreJs.MUTEX._lock(id, name, expiresAt));
+                var id = MutexJs.Semaphore._guid();
+                MutexJs.Semaphore._locks.push(new MutexJs.Semaphore._lock(id, name, expiresAt));
                 return id;
             }
 
-            return undefined; // cannot acquire lock
+            return null; // cannot acquire lock
         },
+
         /** @ignore */
         release: function (id) {
             'use strict';
-            SemaphoreJs.MUTEX._locks = SemaphoreJs.MUTEX._locks.filter(function (el) {
+            MutexJs.Semaphore._locks = MutexJs.Semaphore._locks.filter(function (el) {
                 return el.id !== id;
             });
         },
+
         /** @ignore */
         _get: function (name) {
             'use strict';
-            for (var key in SemaphoreJs.MUTEX._locks) {
-                if (SemaphoreJs.MUTEX._locks[key].name === name) {
-                    return SemaphoreJs.MUTEX._locks[key];
+            for (var key in MutexJs.Semaphore._locks) {
+                if (MutexJs.Semaphore._locks[key].name === name) {
+                    return MutexJs.Semaphore._locks[key];
                 }
             }
-            return undefined; // not found
+            return null; // not found
         },
+
         /** @ignore */
         _guid: function () {
             function s4() {
@@ -91,13 +96,14 @@ var SemaphoreJs = {
             return s4()+s4()+'-'+s4()+'-'+s4()+'-'+s4()+'-'+s4()+s4()+s4();
         },
     },
+
     /**
      * Create a lock using the passed in name or wait until the lock
      * can be obtained or for the &lt;i>&lt;b>maxWaitMs&lt;/b>&lt;/i> if it is currently in use.
      * If &lt;i>&lt;b>maxWaitMs&lt;/b>&lt;/i> time has passed and the lock is not available then
      * &lt;i>&lt;b>timeoutCallback&lt;/b>&lt;/i> will be called. The lock will be held until
      * released.
-     * 
+     *
      * @param {string} name - unique name of lock to acquire
      * @param {function} success - function to call when lock acquired. This
      *   function will be passed the unique id of the lock which must be used
@@ -116,22 +122,24 @@ var SemaphoreJs = {
 		if (maxWaitMs && typeof maxWaitMs === "number") {
 			expiry = new Date().getTime() + maxWaitMs;
 		}
-        SemaphoreJs._get(name, success, timeoutCallback, expiry, undefined);
+        MutexJs._get(name, success, timeoutCallback, expiry, undefined);
     },
+
     /**
      * Create a lock using the passed in name or wait until the lock
      * can be obtained if it is currently in use. Once obtained, the lock
      * will be held for maximum &lt;i>&lt;b>duration&lt;/b>&lt;/i> milliseconds or until
      * released.
-     * 
+     *
      * @param {string} name - unique name of lock to acquire
      * @param {function} success - function to call when lock acquired
      * @param {number} duration - number of milliseconds to hold the lock
      */
     lockFor: function (name, success, duration) {
         'use strict';
-        SemaphoreJs._get(name, success, function () {}, -1, duration);
+        MutexJs._get(name, success, function () {}, -1, duration);
     },
+
     /**
      * Release a lock using the &lt;i>&lt;b>id&lt;/b>&lt;/i> returned when the lock was acquired
      *
@@ -140,19 +148,20 @@ var SemaphoreJs = {
      */
     release: function (id) {
         'use strict';
-        SemaphoreJs.MUTEX.release(id);
+        MutexJs.Semaphore.release(id);
     },
+
     /** @ignore */
     _get: function (name, success, failure, maxMsTime, lockDuration) {
         'use strict';
-        var id = SemaphoreJs.MUTEX.get(name, lockDuration);
+        var id = MutexJs.Semaphore.get(name, lockDuration);
         if (id) {
             success(id);
         } else {
-            if (maxMsTime === -1 || (new Date().getTime() + SemaphoreJs.RETRY_MS) &lt; maxMsTime) {
+            if (maxMsTime === -1 || (new Date().getTime() + MutexJs.RETRY_MS) &lt; maxMsTime) {
                 setTimeout(function () {
-                    SemaphoreJs._get(name, success, failure, maxMsTime, lockDuration);
-                }, SemaphoreJs.RETRY_MS);
+                    MutexJs._get(name, success, failure, maxMsTime, lockDuration);
+                }, MutexJs.RETRY_MS);
             } else {
                 var msg = "unable to acquire lock for: " + name;
                 if (failure) {
@@ -163,7 +172,11 @@ var SemaphoreJs = {
             }
         }
     }
-};</code></pre>
+};
+
+var module = module || {};
+module.exports = MutexJs;
+</code></pre>
         </article>
     </section>
 
@@ -173,13 +186,13 @@ var SemaphoreJs = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="SemaphoreJs.html">SemaphoreJs</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="MutexJs.html">MutexJs</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Jan 03 2015 14:14:40 GMT-0000 (GMT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Feb 06 2015 23:24:50 GMT-0000 (GMT)
 </footer>
 
 <script> prettyPrint(); </script>
