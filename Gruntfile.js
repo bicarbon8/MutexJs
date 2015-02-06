@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     files: {
       base: [
-        "semaphore.js",
+        "mutex.js",
       ],
       tests: "tests/index.html"
     },
@@ -35,7 +35,7 @@ module.exports = function(grunt) {
     },
     jsdoc: {
       dist: {
-        src: ['<%= files.base %>'], 
+        src: ['<%= files.base %>'],
         dest: 'dist/doc'
       }
     }

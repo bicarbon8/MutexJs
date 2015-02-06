@@ -1,8 +1,8 @@
 {
-  "name": "SemaphoreJs",
+  "name": "MutexJs",
   "version": "1.0.0",
   "description": "in the world of async javascript callbacks this library provides a mechanism to ensure resources are available for access",
-  "main": "semaphore",
+  "main": "mutex",
   "directories": {
     "test": "tests"
   },

@@ -10,11 +10,11 @@ in the world of async javascript callbacks this library provides a mechanism to 
 ## Usage:
 
 ```
-SemaphoreJs.lock(uniqueName, successCallback[[, maxWaitTime], timeoutCallback]);
+MutexJs.lock(uniqueName, successCallback[[, maxWaitTime], timeoutCallback]);
 ```
 or
 ```
-SemaphoreJs.lockFor(uniqueName, successCallback, duration);
+MutexJs.lockFor(uniqueName, successCallback, duration);
 ```
 
 ## Tests:
