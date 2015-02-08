@@ -5,18 +5,21 @@ var MutexJs = {
     Semaphore: {
         /** @ignore */
         _locks: [],
+        _pruning: false,
 
         /** @ignore */
-        _lock: function (id, name, expiresAt) {
+        _lock: function (id, name, expiresAt, expirationCallback) {
             'use strict';
             this.id = id;
             this.name = name;
             this.expiresAt = expiresAt;
+            this.expirationCallback = expirationCallback;
         },
 
         /** @ignore */
-        get: function (name, expiresInMs) {
+        get: function (name, expiresInMs, expirationCallback) {
             'use strict';
+            MutexJs.Semaphore._beginPruning();
             var expiresAt = null, // never expires (DANGER!)
                 unlocked = false,
                 lock = MutexJs.Semaphore._get(name);
@@ -27,13 +30,12 @@ var MutexJs = {
 
             if (!lock) {
                 unlocked = true; // doesn't exist
-            } else if ((lock.expiresAt) && (lock.expiresAt < new Date().getTime())){
-                unlocked = true; // exists, but is expired
             }
 
             if (unlocked) {
                 var id = MutexJs.Semaphore._guid();
-                MutexJs.Semaphore._locks.push(new MutexJs.Semaphore._lock(id, name, expiresAt));
+                MutexJs.Semaphore._locks.push(
+                    new MutexJs.Semaphore._lock(id, name, expiresAt, expirationCallback));
                 return id;
             }
 
@@ -68,6 +70,28 @@ var MutexJs = {
             }
             return s4()+s4()+'-'+s4()+'-'+s4()+'-'+s4()+'-'+s4()+s4()+s4();
         },
+
+        _beginPruning: function () {
+            if (!MutexJs.Semaphore._pruning) {
+                MutexJs.Semaphore._pruning = true;
+                MutexJs.Semaphore._pruneExpired();
+            }
+        },
+
+        /** @ignore */
+        _pruneExpired: function () {
+            MutexJs.Semaphore._locks.forEach(function (lock) {
+                if ((lock.expiresAt) && (lock.expiresAt < new Date().getTime())){
+                    MutexJs.Semaphore.release(lock.id);
+                    if (lock.expirationCallback) {
+                        lock.expirationCallback.call(this, lock);
+                    }
+                }
+            });
+            setTimeout(function () {
+                MutexJs.Semaphore._pruneExpired();
+            },10);
+        },
     },
 
     /**
@@ -95,7 +119,7 @@ var MutexJs = {
 		if (maxWaitMs && typeof maxWaitMs === "number") {
 			expiry = new Date().getTime() + maxWaitMs;
 		}
-        MutexJs._get(name, success, timeoutCallback, expiry, undefined);
+        MutexJs._get(name, success, timeoutCallback, expiry, undefined, undefined);
     },
 
     /**
@@ -108,9 +132,9 @@ var MutexJs = {
      * @param {function} success - function to call when lock acquired
      * @param {number} duration - number of milliseconds to hold the lock
      */
-    lockFor: function (name, success, duration) {
+    lockFor: function (name, success, duration, onExpiration) {
         'use strict';
-        MutexJs._get(name, success, function () {}, -1, duration);
+        MutexJs._get(name, success, function () {}, -1, duration, onExpiration);
     },
 
     /**
@@ -125,9 +149,9 @@ var MutexJs = {
     },
 
     /** @ignore */
-    _get: function (name, success, failure, maxMsTime, lockDuration) {
+    _get: function (name, success, failure, maxMsTime, lockDuration, expirationCallback) {
         'use strict';
-        var id = MutexJs.Semaphore.get(name, lockDuration);
+        var id = MutexJs.Semaphore.get(name, lockDuration, expirationCallback);
         if (id) {
             success(id);
         } else {
