@@ -14,7 +14,7 @@ MutexJs.lock(uniqueName, successCallback[[, maxWaitTime], timeoutCallback]);
 ```
 or
 ```
-MutexJs.lockFor(uniqueName, successCallback, duration);
+MutexJs.lockFor(uniqueName, successCallback, duration[, expiredCallback]);
 ```
 
 ## Tests:
