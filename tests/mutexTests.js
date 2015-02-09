@@ -153,7 +153,8 @@ QUnit.asyncTest("can lock for a specified duration with expirationCallback", fun
     // get lock
     MutexJs.lockFor(lockName, function (id) {
         assert.ok(true);
-    }, 1000, // hold lock for maximum of 1 second
+    },
+    1000, // hold lock for maximum of 1 second
     function onExpiration() {
         pass();
     });
