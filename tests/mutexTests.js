@@ -137,3 +137,25 @@ QUnit.asyncTest("can lock for a specified duration after waiting", function (ass
     // get third lock
     MutexJs.lock(lockName, pass); // no timeout
 });
+
+QUnit.asyncTest("can lock for a specified duration with expirationCallback", function (assert) {
+    'use strict';
+    expect(2);
+    var start = new Date().getTime();
+    function pass() {
+        var now = new Date().getTime();
+        if (((now - start) >= 1000) && ((now - start) < 1020)) {
+            assert.ok(true);
+        }
+        QUnit.start();
+    }
+
+    // get lock
+    MutexJs.lockFor(lockName, function (id) {
+        assert.ok(true);
+    },
+    1000, // hold lock for maximum of 1 second
+    function onExpiration() {
+        pass();
+    });
+});
