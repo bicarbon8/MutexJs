@@ -21,7 +21,6 @@ var MutexJs = {
         /** @ignore */
         get: function (name, expiresInMs, expirationCallback) {
             'use strict';
-            MutexJs.Semaphore._beginPruning();
             var expiresAt = null, // never expires (DANGER!)
                 unlocked = false,
                 lock = MutexJs.Semaphore._get(name);
@@ -38,6 +37,7 @@ var MutexJs = {
                 var id = MutexJs.Semaphore._guid();
                 MutexJs.Semaphore._locks.push(
                     new MutexJs.Semaphore._lock(id, name, expiresAt, expirationCallback));
+                MutexJs.Semaphore._beginPruning();
                 return id;
             }
 
@@ -91,9 +91,14 @@ var MutexJs = {
                         }
                     }
                 });
-                setTimeout(function () {
-                    MutexJs.Semaphore._pruneExpired();
-                },MutexJs.RETRY_MS);
+                if (MutexJs.Semaphore._locks.length > 0) {
+                    setTimeout(function () {
+                        MutexJs.Semaphore._pruneExpired();
+                    },MutexJs.RETRY_MS);
+                } else {
+                    // become dormant if there is nothing to process
+                    MutexJs.Semaphore._pruning = false;
+                }
             }
         },
 
@@ -192,7 +197,9 @@ var MutexJs = {
      */
     _run: function () {
         'use strict';
+        var foundOne = false;
         for (var name in MutexJs._queues) {
+            foundOne = true;
             var queue = MutexJs._queues[name];
             if (queue.length > 0) {
                 var item = queue[0];
@@ -216,10 +223,15 @@ var MutexJs = {
                 delete MutexJs._queues[name];
             }
         }
-        // keep running
-        setTimeout(function () {
-            MutexJs._run();
-        }, MutexJs.RETRY_MS);
+        if (MutexJs._running && foundOne) {
+            // keep running
+            setTimeout(function () {
+                MutexJs._run();
+            }, MutexJs.RETRY_MS);
+        } else {
+            // become dormant if there is nothing to process
+            MutexJs._running = false;
+        }
     },
 
     /**
@@ -227,6 +239,7 @@ var MutexJs = {
      * @ignore
      */
     _reset: function () {
+        MutexJs._running = false;
         MutexJs._queues = {};
         MutexJs.Semaphore._reset();
     }

@@ -10,6 +10,7 @@ QUnit.module("MutexJs", {
     },
     teardown: function () {
         lockName = undefined;
+        MutexJs._reset();
     }
 });
 QUnit.asyncTest("can lock with name and block", function (assert) {
@@ -140,14 +141,18 @@ QUnit.asyncTest("can lock for a specified duration after waiting", function (ass
 
 QUnit.asyncTest("can lock for a specified duration with expirationCallback", function (assert) {
     'use strict';
-    expect(2);
+    expect(4);
     var start = new Date().getTime();
     function pass() {
         var now = new Date().getTime();
         if (((now - start) >= 1000) && ((now - start) < 1020)) {
             assert.ok(true);
         }
-        QUnit.start();
+        setTimeout(function () {
+            assert.ok(!MutexJs._running, "expected not running");
+            assert.ok(!MutexJs.Semaphore._pruning, "expected not pruning");
+            QUnit.start();
+        }, 100);
     }
 
     // get lock
