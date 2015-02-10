@@ -181,14 +181,17 @@ var MutexJs = {
     },
 
     _queueItem: function (item) {
-        if (!MutexJs._queues[item.name]) {
-            MutexJs._queues[item.name] = [];
-        }
-        MutexJs._queues[item.name].push(item);
-        if (!MutexJs._running) {
-            MutexJs._running = true;
-            MutexJs._run();
-        }
+        // disconnect from synchronous execution
+        setTimeout(function () {
+            if (!MutexJs._queues[item.name]) {
+                MutexJs._queues[item.name] = [];
+            }
+            MutexJs._queues[item.name].push(item);
+            if (!MutexJs._running) {
+                MutexJs._running = true;
+                MutexJs._run();
+            }
+        }, 1);
     },
 
     /**
@@ -198,6 +201,7 @@ var MutexJs = {
     _run: function () {
         'use strict';
         var foundOne = false;
+        /* jshint loopfunc: true */
         for (var name in MutexJs._queues) {
             foundOne = true;
             var queue = MutexJs._queues[name];

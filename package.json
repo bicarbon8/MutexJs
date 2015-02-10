@@ -1,6 +1,6 @@
 {
   "name": "mutexjs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "in the world of async javascript callbacks this library provides a mechanism to ensure resources are available for access",
   "main": "mutex",
   "directories": {
