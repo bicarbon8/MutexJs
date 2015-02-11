@@ -25,9 +25,8 @@ function beginAsync(data, callback) {
     data.beginChanges();
     callback.call(this, id, data); // pass the lock ID to the callback
   }, 2000, // lock for maximum 2 seconds
-  function onError() {
-    data.rollbackChanges();
-    callback.call(this, null, "lock lost after 2 seconds");
+  function onLockTimeout() {
+    data.rollbackChanges(); // only called if lock held more than 2 seconds
   });
 }
 function endAsync(id, data) {
