@@ -40,3 +40,68 @@ function endAsync(id, data) {
 beginAsync(data, endAsync); // lock for 1 second
 beginAsync(data, endAsync); // operations will run after 1 second and 'data' object operations will not overlap
 ```
+
+## Usage in existing projects
+[PhantomFunctionalTest](https://github.com/bicarbon8/PhantomFunctionalTest/blob/master/lib/pft/objects/tester.js#L123)
+```javascript
+// get a lock so we can run the test
+MutexJs.lockFor(PFT.tester.TEST, function onStart(runUnlockId) {
+    t.runUnlockId = runUnlockId;
+    var suite = "";
+    if (t.suite) {
+      if (t.suite.name) {
+        suite = t.suite.name + " - ";
+      }
+    }
+    var msg = "Starting: '" + suite + t.name + "'...";
+    PFT.logger.log(PFT.logger.TEST, msg);
+    var testId = PFT.guid();
+
+    // run setup
+    if (t.suite && t.suite.setup) {
+      MutexJs.lock(testId, function setup(unlockId) {
+          setTimeout(function () {
+              var done = function () {
+                  MutexJs.release(unlockId);
+              };
+              t.suite.setup.call(this, done);
+          }.bind(this), 1);
+      }.bind(this));
+    }
+    // run test
+    MutexJs.lock(testId, function test(unlockId) {
+      setTimeout(function () {
+          t.page = PFT.createPage();
+          t.unlockId = unlockId;
+          t.startTime = new Date().getTime();
+          PFT.tester._tests.push(t);
+          PFT.tester.onTestStarted({ test: t });
+          callback.call(this, t.page, new PFT.tester.assert(t));
+      }.bind(this), 1);
+    }.bind(this));
+    // run teardown
+    if (t.suite && t.suite.teardown) {
+      MutexJs.lock(testId, function teardown(unlockId) {
+          setTimeout(function () {
+              var done = function () {
+                  MutexJs.release(unlockId);
+              };
+              t.suite.teardown.call(this, done);
+          }.bind(this), 1);
+      }.bind(this));
+    }
+    MutexJs.lock(testId, function done(unlockId) {
+      setTimeout(function () {
+          PFT.tester.closeTest(t);
+          MutexJs.release(unlockId);
+          MutexJs.release(runUnlockId);
+      }.bind(this), 1);
+    }.bind(this));
+}.bind(this), t.timeout, function onTimeout() {
+  var msg = "Test '" + t.name + "' exceeded timeout of " + t.timeout;
+  t.errors.push(msg);
+  PFT.logger.log(PFT.logger.TEST, msg);
+  PFT.tester.onTimeout({ test: t, message: msg });
+  PFT.tester.closeTest(t);
+}.bind(this));
+```
