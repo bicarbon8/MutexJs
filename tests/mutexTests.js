@@ -164,3 +164,48 @@ QUnit.asyncTest("can lock for a specified duration with expirationCallback", fun
         pass();
     });
 });
+
+QUnit.asyncTest("can recover from script errors", function (assert) {
+    expect(4);
+    var tmp = window.onerror;
+    // restart on error
+    window.onerror = function (errorMsg, url, lineNumber) {
+        MutexJs.recover();
+    };
+    var name = "foo";
+    var ids = [];
+    var count = 3;
+    MutexJs.lock(name, function (id) {
+        ids.push(id);
+        assert.ok(true, "first");
+        does.not.exist = foo;
+    });
+    MutexJs.lock(name, function (id) {
+        ids.push(id);
+        assert.ok(true, "second");
+        does.not.exist = foo;
+    });
+    MutexJs.lock(name, function (id) {
+        ids.push(id);
+        assert.ok(true, "third");
+        does.not.exist = foo;
+    });
+
+    function looper(lockIds) {
+        var lockId = lockIds.shift();
+        count--;
+        MutexJs.release(lockId);
+        if (count > 0) {
+            setTimeout(function () {
+                looper(lockIds);
+            }, 250);
+        } else {
+            window.onerror = tmp;
+            assert.ok(true, "finished");
+            QUnit.start();
+        }
+    }
+    setTimeout(function () {
+        looper(ids);
+    }, 250);
+});

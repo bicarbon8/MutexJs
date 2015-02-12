@@ -246,6 +246,17 @@ var MutexJs = {
         MutexJs._running = false;
         MutexJs._queues = {};
         MutexJs.Semaphore._reset();
+    },
+
+    /**
+     * provides a mechanism for restarting when script errors occur that could
+     * halt execution
+     */
+    recover: function () {
+        MutexJs._running = true;
+        MutexJs._run();
+        MutexJs.Semaphore._pruning = true;
+        MutexJs.Semaphore._beginPruning();
     }
 };
 
