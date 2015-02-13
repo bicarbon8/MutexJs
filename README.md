@@ -9,16 +9,16 @@ in the world of async javascript callbacks this library provides a mechanism to 
 
 ## Usage:
 
-```javascript
+```js
 MutexJs.lock(uniqueName, successCallback[[, maxWaitTime], timeoutCallback]);
 ```
 or
-```javascript
+```js
 MutexJs.lockFor(uniqueName, successCallback, duration[, expiredCallback]);
 ```
 
 ## Example usage:
-```javascript
+```js
 function beginAsync(data, callback) {
   // ensure lock before starting
   MutexJs.lockFor('AsyncLock', function (id) {
@@ -42,66 +42,70 @@ beginAsync(data, endAsync); // operations will run after 1 second and 'data' obj
 ```
 
 ## Usage in existing projects
-[PhantomFunctionalTest](https://github.com/bicarbon8/PhantomFunctionalTest/blob/master/lib/pft/objects/tester.js#L123)
-```javascript
+[PhantomFunctionalTest](https://github.com/bicarbon8/PhantomFunctionalTest/blob/master/lib/pft/objects/tester.js#L129)
+```js
 // get a lock so we can run the test
-MutexJs.lockFor(PFT.tester.TEST, function onStart(runUnlockId) {
-    t.runUnlockId = runUnlockId;
+MutexJs.lockFor("PFT.tester.test", function onStart(runUnlockId) {
+    testObj.runUnlockId = runUnlockId;
+    PFT.tester._tests.push(testObj);
     var suite = "";
-    if (t.suite) {
-      if (t.suite.name) {
-        suite = t.suite.name + " - ";
-      }
+    if (testObj.suite) {
+        if (testObj.suite.name) {
+            suite = testObj.suite.name + " - ";
+        }
     }
-    var msg = "Starting: '" + suite + t.name + "'...";
+    var msg = "Starting: '" + suite + testObj.name + "'...";
     PFT.logger.log(PFT.logger.TEST, msg);
     var testId = PFT.guid();
 
     // run setup
-    if (t.suite && t.suite.setup) {
-      MutexJs.lock(testId, function setup(unlockId) {
-          setTimeout(function () {
-              var done = function () {
-                  MutexJs.release(unlockId);
-              };
-              t.suite.setup.call(this, done);
-          }.bind(this), 1);
-      }.bind(this));
+    if (testObj.suite && testObj.suite.setup) {
+        MutexJs.lock(testId, function setup(unlockId) {
+            testObj.unlockId = unlockId;
+            var done = function () {
+                PFT.tester.haltCurrentScript();
+            };
+            testObj.suite.setup.call(this, done);
+        });
     }
+
     // run test
     MutexJs.lock(testId, function test(unlockId) {
-      setTimeout(function () {
-          t.page = PFT.createPage();
-          t.unlockId = unlockId;
-          t.startTime = new Date().getTime();
-          PFT.tester._tests.push(t);
-          PFT.tester.onTestStarted({ test: t });
-          callback.call(this, t.page, new PFT.tester.assert(t));
-      }.bind(this), 1);
-    }.bind(this));
+        testObj.page = PFT.createPage();
+        testObj.unlockId = unlockId;
+        testObj.startTime = new Date().getTime();
+        PFT.tester.onTestStarted({ "test": testObj });
+        callback.call(this, testObj.page, new PFT.tester.assert(testObj));
+    });
+
     // run teardown
-    if (t.suite && t.suite.teardown) {
-      MutexJs.lock(testId, function teardown(unlockId) {
-          setTimeout(function () {
-              var done = function () {
-                  MutexJs.release(unlockId);
-              };
-              t.suite.teardown.call(this, done);
-          }.bind(this), 1);
-      }.bind(this));
+    if (testObj.suite && testObj.suite.teardown) {
+        MutexJs.lock(testId, function teardown(unlockId) {
+            testObj.unlockId = unlockId;
+            var done = function () {
+                PFT.tester.haltCurrentScript();
+            };
+            testObj.suite.teardown.call(this, done);
+        });
     }
+
     MutexJs.lock(testId, function done(unlockId) {
-      setTimeout(function () {
-          PFT.tester.closeTest(t);
-          MutexJs.release(unlockId);
-          MutexJs.release(runUnlockId);
-      }.bind(this), 1);
-    }.bind(this));
-}.bind(this), t.timeout, function onTimeout() {
-  var msg = "Test '" + t.name + "' exceeded timeout of " + t.timeout;
-  t.errors.push(msg);
-  PFT.logger.log(PFT.logger.TEST, msg);
-  PFT.tester.onTimeout({ test: t, message: msg });
-  PFT.tester.closeTest(t);
-}.bind(this));
+        PFT.tester.closeTest(testObj);
+        MutexJs.release(unlockId);
+        MutexJs.release(runUnlockId);
+    });
+}, testObj.timeout, function onTimeout() {
+    var msg = "Test '" + testObj.name + "' exceeded timeout of " + testObj.timeout;
+    testObj.errors.push(msg);
+    PFT.logger.log(PFT.logger.TEST, msg);
+    PFT.tester.onTimeout({ "test": testObj, message: msg });
+
+    // close resources
+    PFT.tester.closeTest(testObj);
+
+    // don't continue running
+    testObj.unlockId = null;
+
+    PFT.tester.haltCurrentScript();
+});
 ```
